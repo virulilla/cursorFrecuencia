@@ -1,3 +1,7 @@
+# ¡Importante!: 'sql_clause' con ORDER BY sólo es soportado por bases de datos, no por otro tipo de datos
+# como dBASE o INFO tables. Para solucionarlo se han copiado los datos a una nueva tabla dentro de una nueva gdb.
+
+
 import arcpy, os
 arcpy.env.overwriteOutput = True
 
@@ -11,17 +15,21 @@ while not flag:
     else:
         print("Este directorio no contiene el dbf")
 
-# arcpy.Sort_management(dbf, "dbf_sorted", [["trip_id", "ASCENDING"], ["arrival_ti", "ASCENDING"]])
 
-# listField = ["OID", "OBJECTID", "trip_id", "arrival_ti", "departure", "stop_id", "stop_seque", "stop_heads", "pickup_typ", "drop_off_t", "shape_dist", "TIEMPO", "FRECUENCIA"]
+stops = os.path.join(path, "Stops.gdb")
+if arcpy.Exists(stops):
+    arcpy.Delete_management(stops)
+arcpy.CreateFileGDB_management(path, "Stops")
+arcpy.TableToTable_conversion(dbf, stops, os.path.splitext(dbf)[0])
+table = arcpy.env.workspace = os.path.join(path, stops, os.path.splitext(dbf)[0])
 
 tiempoList = []
 i = 1
-with arcpy.da.SearchCursor(dbf, '*', sql_clause=(None, "ORDER BY trip_id, arrival_ti")) as sCursor:
+with arcpy.da.SearchCursor(table, '*', sql_clause=(None, "ORDER BY trip_id, arrival_ti")) as sCursor:
     for sRow in sCursor:
         tiempoList.append(sRow[11])
 
-with arcpy.da.UpdateCursor(dbf, '*', sql_clause=(None, "ORDER BY trip_id, arrival_ti")) as uCursor:
+with arcpy.da.UpdateCursor(table, '*', sql_clause=(None, "ORDER BY trip_id, arrival_ti")) as uCursor:
     for uRow in uCursor:
         if i < len(tiempoList):
             # uRow.next()
