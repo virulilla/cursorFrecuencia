@@ -32,7 +32,6 @@ with arcpy.da.SearchCursor(table, '*', sql_clause=(None, "ORDER BY trip_id, arri
 with arcpy.da.UpdateCursor(table, '*', sql_clause=(None, "ORDER BY trip_id, arrival_ti")) as uCursor:
     for uRow in uCursor:
         if i < len(tiempoList):
-            # uRow.next()
             uRow[12] = tiempoList[i] - uRow[11]
             uCursor.updateRow(uRow)
             i += 1
