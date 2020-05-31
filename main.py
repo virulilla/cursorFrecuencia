@@ -19,6 +19,7 @@ while not flag:
     else:
         print("Este directorio no contiene el mdb")
 
+f = open(os.path.join(path, "frec_interurbanos.txt"), 'w')
 interurbanos = os.path.join(path, "Interurbanos.gdb")
 if arcpy.Exists(interurbanos):
     arcpy.Delete_management(interurbanos)
@@ -72,9 +73,12 @@ for itinerate in set(codItinList):
 
     print itinerate
     for obj2 in viewTableDay:
-        lineaFichero = []
-        lineaFichero.append(itinerate)
+        lineaFichero = ['', '-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0']
+        # lineaFichero.append(itinerate)
+        lineaFichero[0] = itinerate.encode("utf-8")
         freqList = []
+        i = 1
+        j = 2
         for obj3 in obj2:
             freqList.append(obj3.FRECUENCIA)
 
@@ -86,9 +90,20 @@ for itinerate in set(codItinList):
                         timeList.append(obj4.TIEMPO)
                 maximo = max(timeList)
                 minimo = min(timeList)
-                lineaFichero.append(minimo[:-2] + maximo[:-2])
-                lineaFichero.append(freq)
+                # lineaFichero.append(minimo[:-2] + maximo[:-2])
+                # lineaFichero.append(freq)
+                if j < len(lineaFichero):
+                    lineaFichero[i] = (minimo[:-2] + maximo[:-2]).encode("utf-8")
+                    lineaFichero[j] = str(freq)
+                else:
+                    lineaFichero.append((minimo[:-2] + maximo[:-2]).encode("utf-8"))
+                    lineaFichero.append(str(freq))
+                i = i + 2
+                j = j + 2
 
+        lineaFichero.append("\n")
+        f.writelines(lineaFichero)
+f.close()
 print "Fin " + str(datetime.now().time())
 
 
