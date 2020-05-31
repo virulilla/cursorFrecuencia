@@ -29,9 +29,9 @@ class uniqRouteIdClass:
         self.FRECUENCIA = vRow[24]
         self.TIEMPO = vRow[25]
 
-def rellenaUniqRouteIdClass(data):
-    dayViewList = []
+def fillUniqRouteIdClass(data):
+    viewTableData = []
     with arcpy.da.SearchCursor(data, '*') as moduleCursor:
         for dataRow in moduleCursor:
-            dayViewList.append(uniqRouteIdClass(dataRow))
-    return dayViewList
+            viewTableData.append(uniqRouteIdClass(dataRow))
+    return viewTableData
