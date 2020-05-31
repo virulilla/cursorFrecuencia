@@ -26,13 +26,10 @@ arcpy.CreateFileGDB_management(path, "Interurbanos")
 arcpy.TableToTable_conversion(os.path.join(mdb, "Stop_Times_seq0_Trips_Calendar"), interurbanos, "Stop_Times_seq0_Trips_Calendar")
 table = arcpy.env.workspace = os.path.join(path, interurbanos, "Stop_Times_seq0_Trips_Calendar")
 
-arcpy.AddField_management(table, "TIEMPO_AUX", "DATE")
 arcpy.AddField_management(table, "FRECUENCIA", "FLOAT", field_scale=1)
 arcpy.AddField_management(table, "TIEMPO", "TEXT")
-
-calculateModule.calculateTimeText(table)
-calculateModule.calculateFrequency(table)
-arcpy.DeleteField_management(table, "TIEMPO_AUX")
+calculateModule.calculateFRECUENCIA(table)
+calculateModule.calculateTIEMPO(table)
 
 # Se localizan los valores unicos de routeId
 routeIdList = []
