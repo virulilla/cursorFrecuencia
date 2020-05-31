@@ -1,4 +1,4 @@
-import arcpy
+import arcpy, re
 from datetime import datetime, timedelta
 
 # Funcion que calcula las frecuencias mediante una diferencia entre dos elementos contiguos de la lista tiempoList[]
@@ -9,11 +9,12 @@ from datetime import datetime, timedelta
 # siguiente, por tanto el valor queda como None
 # tiempoList[] contiene las horas y se recorre con el contador i
 # deltaTimeList contiene las frecuencias y se recorre con el contador j
-def calculateFRECUENCIA (data):
+def calculateFRECUENCIA(data):
     tiempoList = []
     deltaTimeList = []
     i = 1
     j = 0
+    arcpy.AddField_management(data, "FRECUENCIA", "FLOAT", field_scale=1)
     with arcpy.da.SearchCursor(data, '*', sql_clause=(None, "ORDER BY trip_id, arrival_time")) as sCursor:
         for sRow in sCursor:
             tiempoList.append(datetime.strptime(sRow[2], '%H:%M:%S') + timedelta(hours=2))
@@ -31,11 +32,18 @@ def calculateFRECUENCIA (data):
                 j += 1
 
 
-# Funcion que calcula el campo TIEMPO, a partir del campo 'arrival_time'.
+# Funcion que calcula el campo TIEMPO y COD_ITIN, a partir del campo 'arrival_time' y roud_id.
 # Se convierte a dato de tipo 'date', se suman 2h y posteriormente se vuelve a convertir a tipo 'texto' y
 # se eliminan los caracteres innecesarios, como el ':' y la fecha.
-def calculateTIEMPO (data):
+def calculateTIEMPOandCOD_ITIN(data):
+    arcpy.AddField_management(data, "TIEMPO", "TEXT")
+    arcpy.AddField_management(data, "COD_ITIN", "TEXT")
     with arcpy.da.UpdateCursor(data, '*', sql_clause=(None, "ORDER BY trip_id, arrival_time")) as Cursor:
         for row in Cursor:
             row[25] = (datetime.strptime(row[2], '%H:%M:%S') + timedelta(hours=2)).strftime('%Y/%m/%d %H:%M:%S')[11:].translate(None, ':')
+            found = ''
+            m = re.search('\d{3}', row[7])
+            if m:
+                found = m.group(0)
+            row[26] = row[7][0] + "___" + found
             Cursor.updateRow(row)

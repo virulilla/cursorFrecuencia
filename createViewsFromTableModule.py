@@ -1,6 +1,6 @@
 import arcpy
 
-class uniqRouteIdClass:
+class viewTableClass:
     def __init__(self, vRow):
         # self.OBJECTID = vRow[0]
         # self.trip_id = ''
@@ -29,9 +29,9 @@ class uniqRouteIdClass:
         self.FRECUENCIA = vRow[24]
         self.TIEMPO = vRow[25]
 
-def fillUniqRouteIdClass(data):
-    viewTableData = []
-    with arcpy.da.SearchCursor(data, '*') as moduleCursor:
+def fillViewTableData(data, sql_exp):
+    viewData = []
+    with arcpy.da.SearchCursor(data, '*', where_clause=sql_exp) as moduleCursor:
         for dataRow in moduleCursor:
-            viewTableData.append(uniqRouteIdClass(dataRow))
-    return viewTableData
+            viewData.append(viewTableClass(dataRow))
+    return viewData
