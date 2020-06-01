@@ -7,7 +7,7 @@ import arcpy, os, re, createViewsFromTableModule, calculateModule
 from datetime import datetime, timedelta
 
 arcpy.env.overwriteOutput = True
-# print "Inicio " + str(datetime.now().time())
+print "Inicio " + str(datetime.now().time())
 mdb = "Interurbanos.mdb"
 flag = False
 while not flag:
@@ -37,9 +37,9 @@ with arcpy.da.SearchCursor(table, '*') as cursor:
 
 arcpy.env.workspace = interurbanos
 
-# Se crean tantas tablas como routeId diferentes haya con TableToTable
-# Cada una de las tablas solo contendra un valor de routeId
-# Se localizan los valores max y min del campo TIEMPO de cada una de las tablas
+# Se hacen tres filtos sucesivos de la tabla original: por cod_itin, por dia de la semana y por frecuencia
+# Se localizan los valores max y min del campo TIEMPO de cada
+# Se escribe el fichero
 days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 viewTable = []
 viewTableDay = [[], [], [], []]
@@ -72,10 +72,10 @@ for itinerate in set(codItinList):
     viewTableDay[3] = viewTableDayFri
 
     print itinerate
+    f.writelines("\n")
     for obj2 in viewTableDay:
-        lineaFichero = ['', '-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0','-1','-1.0']
-        # lineaFichero.append(itinerate)
-        lineaFichero[0] = itinerate.encode("utf-8")
+        lineaFichero = ['', ' -1',' -1.0',' -1',' -1.0',' -1',' -1.0',' -1',' -1.0',' -1',' -1.0',' -1',' -1.0',' -1',' -1.0',' -1',' -1.0',' -1',' -1.0',' -1',' -1.0',' -1',' -1.0',' -1',' -1.0',' -1',' -1.0',' -1',' -1.0',' -1',' -1.0']
+        lineaFichero[0] = itinerate.encode("utf-8") + ", "
         freqList = []
         i = 1
         j = 2
@@ -90,14 +90,12 @@ for itinerate in set(codItinList):
                         timeList.append(obj4.TIEMPO)
                 maximo = max(timeList)
                 minimo = min(timeList)
-                # lineaFichero.append(minimo[:-2] + maximo[:-2])
-                # lineaFichero.append(freq)
                 if j < len(lineaFichero):
-                    lineaFichero[i] = (minimo[:-2] + maximo[:-2]).encode("utf-8")
-                    lineaFichero[j] = str(freq)
+                    lineaFichero[i] = (minimo[:-2] + maximo[:-2] + ", ").encode("utf-8")
+                    lineaFichero[j] = str(freq) + ", "
                 else:
-                    lineaFichero.append((minimo[:-2] + maximo[:-2]).encode("utf-8"))
-                    lineaFichero.append(str(freq))
+                    lineaFichero.append((minimo[:-2] + maximo[:-2] + ", ").encode("utf-8"))
+                    lineaFichero.append(str(freq) + ", ")
                 i = i + 2
                 j = j + 2
 
@@ -105,8 +103,3 @@ for itinerate in set(codItinList):
         f.writelines(lineaFichero)
 f.close()
 print "Fin " + str(datetime.now().time())
-
-
-
-
-# exp3 = "TIEMPO <> \'" + maximo + "\' AND TIEMPO <> \'" + minimo + "\'"
